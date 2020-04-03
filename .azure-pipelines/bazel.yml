@@ -3,6 +3,13 @@ parameters:
     displayName: "CI target"
     type: string
     default: bazel.release
+  - name: rbe
+    displayName: "Enable RBE"
+    type: string
+    default: "true"
+  - name: bazelBuildExtraOptions
+    type: string
+    default: "--config=remote-ci --jobs=$(RbeJobs) --curses=no"
 
 steps:
   - task: CacheBeta@1
@@ -28,8 +35,8 @@ steps:
     workingDirectory: $(Build.SourcesDirectory)
     env:
       ENVOY_DOCKER_BUILD_DIR: $(Build.StagingDirectory)
-      ENVOY_RBE: "true"
-      BAZEL_BUILD_EXTRA_OPTIONS: "--config=remote-ci --jobs=$(RbeJobs) --curses=no"
+      ENVOY_RBE: "${{ parameters.rbe }}"
+      BAZEL_BUILD_EXTRA_OPTIONS: "${{ parameters.bazelBuildExtraOptions }}"
       BAZEL_REMOTE_CACHE: grpcs://remotebuildexecution.googleapis.com
       BAZEL_REMOTE_INSTANCE: projects/envoy-ci/instances/default_instance
       GCP_SERVICE_ACCOUNT_KEY: $(GcpServiceAccountKey)
